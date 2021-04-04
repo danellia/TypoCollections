@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace TypoCollections
@@ -23,18 +22,30 @@ namespace TypoCollections
             dict.Add("чувства", "чуства");
 
             string filepath = "/Volumes/Mac HDD/visualstudio/TypoCollections/TypoCollections/bin/Debug/netcoreapp3.1";
+            string fileText = "";
+            string findNumber = @".012.";
+            string replaceNumber = "+380 12";
 
             var files = Directory.GetFiles(filepath);
             foreach (var file in files)
             {
                 Console.WriteLine(file);
+                
+                using (StreamReader sr = File.OpenText(file))
+                {
+                    fileText = sr.ReadToEnd();
+                }
+
                 foreach (KeyValuePair<string, string> entry in dict)
                 {
-                    Regex regex = new Regex(entry.Value);
-                    MatchCollection matches = regex.Matches(entry.Value);
-                    foreach (var match in matches)
+                    fileText = fileText.Replace(entry.Value, entry.Key);
+                    Regex regex = new Regex(findNumber);
+                    MatchCollection matches = regex.Matches(fileText);
+                    fileText = regex.Replace(fileText, replaceNumber, 10);
+
+                    using (StreamWriter sw = new StreamWriter(file))
                     {
-                        Console.WriteLine(match);
+                        sw.Write(fileText);
                     }
                 }
             }
